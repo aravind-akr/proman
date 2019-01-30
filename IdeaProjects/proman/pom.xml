@@ -9,9 +9,9 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>proman-api</module>
         <module>proman-db</module>
         <module>proman-service</module>
+        <module>proman-api</module>
     </modules>
 
 
