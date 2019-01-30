@@ -14,6 +14,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.upgrad.proman</groupId>
+            <artifactId>proman-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.6.1</version>
@@ -30,10 +35,16 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1212</version>
+        </dependency>
+        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>1.5.18</version>
         </dependency>
+
     </dependencies>
     <build>
         <pluginManagement>
@@ -83,6 +94,17 @@
                         </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/endpoints/signup.json</inputSpec>
+                            <language>spring</language>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>useradmin</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/endpoints/useradmin.json</inputSpec>
                             <language>spring</language>
                         </configuration>
                     </execution>
