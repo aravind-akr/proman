@@ -1,10 +1,15 @@
 package com.upgrad.proman.service.business;
 
 import com.upgrad.proman.service.dao.UserDao;
+import com.upgrad.proman.service.entity.RoleEntity;
+import com.upgrad.proman.service.entity.UserAuthTokenEntity;
 import com.upgrad.proman.service.entity.UserEntity;
 import com.upgrad.proman.service.exception.ResourceNotFoundException;
+import com.upgrad.proman.service.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserAdminBusinessService {
@@ -12,11 +17,34 @@ public class UserAdminBusinessService {
     @Autowired
     private UserDao userDao;
 
-    public UserEntity getUser(final String userUuid) throws ResourceNotFoundException {
-        UserEntity userEntity =  userDao.getUser(userUuid);
-        if(userEntity == null) {
-            throw new ResourceNotFoundException("USR-001", "User not found");
+    @Autowired
+    private PasswordCryptographyProvider cryptographyProvider;
+
+    public UserEntity getUser(final String userUuid, final String authorizationToken) throws ResourceNotFoundException, UnauthorizedException {
+        UserAuthTokenEntity userAuthTokenEntity= userDao.getUserAuthToken(authorizationToken);
+        RoleEntity role = userAuthTokenEntity.getUser().getRole();
+        if(role!=null && role.getUuid() == 101){
+            UserEntity userEntity =  userDao.getUser(userUuid);
+            if(userEntity == null) {
+                throw new ResourceNotFoundException("USR-001", "User not found");
+            }
+            return userEntity;
         }
-        return userEntity;
+        throw new UnauthorizedException("ATH-002", "You are not authorized to fetch user details");
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserEntity createUser(final UserEntity userEntity){
+
+        String password=userEntity.getPassword();
+        if(password == null){
+            userEntity.setPassword("proman@123");
+        }
+
+        String[] encyptedText= cryptographyProvider.encrypt(userEntity.getPassword());
+        userEntity.setSalt(encyptedText[0]);
+        userEntity.setPassword(encyptedText[1]);
+        return userDao.createUser(userEntity);
     }
 }

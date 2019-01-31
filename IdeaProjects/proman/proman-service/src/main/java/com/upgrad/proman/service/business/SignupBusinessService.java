@@ -11,16 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class SignupBusinessService {
 
     @Autowired
-    private UserDao userDao;
-
-    @Autowired
-    private PasswordCryptographyProvider cryptographyProvider;
+    private UserAdminBusinessService userAdminBusinessService;
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity signup(UserEntity userEntity){
-        String[] encyptedText= cryptographyProvider.encrypt(userEntity.getPassword());
-        userEntity.setSalt(encyptedText[0]);
-        userEntity.setPassword(encyptedText[1]);
-        return userDao.createUser(userEntity);
+        return userAdminBusinessService.createUser(userEntity);
     }
 }
